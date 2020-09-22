@@ -1,4 +1,4 @@
-package demo;
+package com.cas.mfa;
 
 import org.apereo.cas.configuration.CasConfigurationProperties;
 import org.apereo.cas.web.flow.configurer.AbstractCasMultifactorWebflowConfigurer;

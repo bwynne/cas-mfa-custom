@@ -1,4 +1,4 @@
-package demo;
+package com.cas.mfa;
 
 import org.apereo.cas.authentication.AuthenticationEventExecutionPlanConfigurer;
 import org.apereo.cas.authentication.AuthenticationHandler;
