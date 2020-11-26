@@ -2,27 +2,30 @@ package com.cas.mfa;
 
 import org.apereo.cas.configuration.CasConfigurationProperties;
 import org.apereo.cas.web.flow.configurer.AbstractCasMultifactorWebflowConfigurer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+import org.springframework.webflow.config.FlowDefinitionRegistryBuilder;
 import org.springframework.webflow.definition.registry.FlowDefinitionRegistry;
 import org.springframework.webflow.engine.builder.support.FlowBuilderServices;
 
+@Component
 public class CustomMultifactorWebflowConfigurer extends AbstractCasMultifactorWebflowConfigurer {
 
-	public static final String MFA_CUSTOM_EVENT_ID = "mfa-custom";
-
-	private final FlowDefinitionRegistry flowDefinitionRegistry;
-
-	public CustomMultifactorWebflowConfigurer(final FlowBuilderServices flowBuilderServices,
-			final FlowDefinitionRegistry loginFlowDefinitionRegistry,
-			final FlowDefinitionRegistry flowDefinitionRegistry, final ApplicationContext applicationContext,
-			final CasConfigurationProperties casProperties) {
+	@Autowired
+	public CustomMultifactorWebflowConfigurer(FlowBuilderServices flowBuilderServices,
+			@Qualifier("loginFlowRegistry") FlowDefinitionRegistry loginFlowDefinitionRegistry,
+			ApplicationContext applicationContext, CasConfigurationProperties casProperties) {
 		super(flowBuilderServices, loginFlowDefinitionRegistry, applicationContext, casProperties);
-		this.flowDefinitionRegistry = flowDefinitionRegistry;
 	}
 
 	@Override
 	protected void doInitialize() {
-		registerMultifactorProviderAuthenticationWebflow(getLoginFlow(), MFA_CUSTOM_EVENT_ID,
-				this.flowDefinitionRegistry, MFA_CUSTOM_EVENT_ID);
+		FlowDefinitionRegistryBuilder builder = new FlowDefinitionRegistryBuilder(this.applicationContext,
+				this.flowBuilderServices);
+		builder.setBasePath("classpath*:/webflow");
+		builder.addFlowLocationPattern("/mfa-custom/*-webflow.xml");
+		registerMultifactorProviderAuthenticationWebflow(getLoginFlow(), "mfa-custom", builder.build(), "mfa-custom");
 	}
 }

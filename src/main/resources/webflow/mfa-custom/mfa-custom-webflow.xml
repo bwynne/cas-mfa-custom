@@ -4,7 +4,7 @@
       xsi:schemaLocation="http://www.springframework.org/schema/webflow
                           http://www.springframework.org/schema/webflow/spring-webflow.xsd">
 
-    <var name="credential" class="com.cas.mfa.CustomAuthenticatorTokenCredential" />
+    <var name="credential" class="com.cas.mfa.CustomCredential" />
     <on-start>
         <evaluate expression="initialFlowSetupAction" />
     </on-start>
