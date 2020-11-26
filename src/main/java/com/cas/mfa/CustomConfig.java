@@ -1,5 +1,6 @@
 package com.cas.mfa;
 
+import org.apereo.cas.authentication.AuthenticationEventExecutionPlan;
 import org.apereo.cas.authentication.AuthenticationEventExecutionPlanConfigurer;
 import org.apereo.cas.authentication.AuthenticationHandler;
 import org.apereo.cas.authentication.MultifactorAuthenticationUtils;
@@ -9,6 +10,8 @@ import org.apereo.cas.configuration.model.support.mfa.MultifactorAuthenticationP
 import org.apereo.cas.services.MultifactorAuthenticationProvider;
 import org.apereo.cas.services.ServicesManager;
 import org.apereo.cas.web.flow.CasWebflowConfigurer;
+import org.apereo.cas.web.flow.CasWebflowExecutionPlan;
+import org.apereo.cas.web.flow.CasWebflowExecutionPlanConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -19,7 +22,7 @@ import org.springframework.webflow.definition.registry.FlowDefinitionRegistry;
 import org.springframework.webflow.engine.builder.support.FlowBuilderServices;
 
 @Configuration
-public class CustomConfig {
+public class CustomConfig implements AuthenticationEventExecutionPlanConfigurer, CasWebflowExecutionPlanConfigurer {
 
 	@Autowired
 	private CasConfigurationProperties casProperties;
@@ -58,10 +61,13 @@ public class CustomConfig {
 
 	@Bean
 	public CasWebflowConfigurer customWebflowConfigurer() {
-		CasWebflowConfigurer c = new CustomMultifactorWebflowConfigurer(flowBuilderServices,
-				loginFlowDefinitionRegistry, customFlowRegistry(), applicationContext, casProperties);
-		c.initialize();
-		return c;
+		return new CustomMultifactorWebflowConfigurer(flowBuilderServices, loginFlowDefinitionRegistry,
+				customFlowRegistry(), applicationContext, casProperties);
+	}
+
+	@Override
+	public void configureWebflowExecutionPlan(CasWebflowExecutionPlan plan) {
+		plan.registerWebflowConfigurer(customWebflowConfigurer());
 	}
 
 	@Bean
@@ -70,10 +76,8 @@ public class CustomConfig {
 				new DefaultPrincipalFactory());
 	}
 
-	@Bean
-	public AuthenticationEventExecutionPlanConfigurer esupotpAuthenticationEventExecutionPlanConfigurer() {
-		return plan -> {
-			plan.registerAuthenticationHandler(customAuthenticatorAuthenticationHandler());
-		};
+	@Override
+	public void configureAuthenticationExecutionPlan(AuthenticationEventExecutionPlan plan) {
+		plan.registerAuthenticationHandler(customAuthenticatorAuthenticationHandler());
 	}
 }
