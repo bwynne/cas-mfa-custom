@@ -24,7 +24,8 @@ public class CustomAuthenticationHandler extends AbstractPreAndPostProcessingAut
 		System.out.println("二次验证");
 
 		Authentication authentication = WebUtils.getInProgressAuthentication();
-		return this.createHandlerResult(credential, authentication.getPrincipal());
+		String id = authentication.getPrincipal().getId();
+		return this.createHandlerResult(credential, principalFactory.createPrincipal(id));
 	}
 
 	@Override
